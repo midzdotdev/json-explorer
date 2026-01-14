@@ -1,0 +1,30 @@
+{
+  "string": "hello world",
+  "number": 42,
+  "booleanTrue": true,
+  "booleanFalse": false,
+  "nullValue": null,
+  "emptyArray": [],
+  "array": [
+    1,
+    "two",
+    false,
+    { "nestedInArray": [3, 4, { "deepArrayObj": "deepValue" }] }
+  ],
+  "emptyObject": {},
+  "object": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "value": "deeply nested",
+          "arrayHere": [
+            { "objInArray": 123 },
+            null,
+            ["veryDeep", { "deep": true }]
+          ]
+        },
+        "anotherField": 99
+      }
+    }
+  }
+}
