@@ -23,7 +23,7 @@ export const CollapseToggle = ({
       )}
     >
       <ChevronRight
-        className={cn("h-4 w-4 transition-transform", isOpen && "rotate-90")}
+        className={cn("size-4 transition-transform", isOpen && "rotate-90")}
       />
     </button>
   )

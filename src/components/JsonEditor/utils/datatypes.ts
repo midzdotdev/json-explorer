@@ -1,0 +1,49 @@
+import { CircleSlash2, Type, Hash, Power, Box, List } from "lucide-react"
+import type { JsonValue, JsonDatatype, JsonTypedValue } from "../../../types"
+
+export const getJsonValueType = (value: JsonValue) => {
+  switch (true) {
+    case value === null:
+      return "null"
+    case value instanceof Array:
+      return "array"
+    case typeof value === "object":
+      return "object"
+    case typeof value === "string":
+      return "string"
+    case typeof value === "number":
+      return "number"
+    case typeof value === "boolean":
+      return "boolean"
+    default:
+      throw new Error(`Unexpected JSON value: ${String(value)}`)
+  }
+}
+
+export function getTypedJsonValue(value: JsonValue): JsonTypedValue {
+  return {
+    type: getJsonValueType(value),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    value: value as any,
+  }
+}
+
+export const getDatatypeColor = (type: JsonDatatype) =>
+  ({
+    null: "text-null-foreground",
+    string: "text-string-foreground",
+    number: "text-number-foreground",
+    boolean: "text-boolean-foreground",
+    object: "text-object-foreground",
+    array: "text-array-foreground",
+  })[type]
+
+export const getDatatypeIcon = (type: JsonDatatype) =>
+  ({
+    null: CircleSlash2,
+    string: Type,
+    number: Hash,
+    boolean: Power,
+    object: Box,
+    array: List,
+  })[type]

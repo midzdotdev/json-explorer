@@ -3,3 +3,34 @@
 
 @source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 @custom-variant dark (&:is(.dark *));
+
+@layer base {
+  :root {
+    --color-string-h: 160;
+    --color-number-h: 250;
+    --color-boolean-h: 50;
+    --color-null-h: 0;
+    --color-object-h: 85;
+    --color-array-h: 320;
+  }
+  
+  :root,
+  [data-theme="light"] {
+    --color-datatype-foreground-lc: 0.45 0.15;
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    --color-datatype-foreground-lc: 0.75 0.12;
+  }
+}
+
+/* Make Tailwind aware of these variables */
+@theme inline {
+  --color-string-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-string-h));
+  --color-number-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-number-h));
+  --color-boolean-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-boolean-h));
+  --color-null-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-null-h));
+  --color-object-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-object-h));
+  --color-array-foreground: oklch(var(--color-datatype-foreground-lc) var(--color-array-h));
+}

@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react"
 import type { JsonValue } from "../../types"
 import { getJsonValueByPath } from "./utils/traversal"
-import { intersperse } from "../../utils/intersperse"
-import { Button } from "@heroui/react"
-import { ChevronRight } from "lucide-react"
+import { Card, CardBody } from "@heroui/react"
 import { JsonFieldList } from "./JsonFieldList"
+import { EditorPath } from "./EditorPath"
 
 export const JsonEditor = ({ data }: { data: JsonValue }) => {
   const [path, setPath] = useState<string[]>([])
@@ -15,44 +14,17 @@ export const JsonEditor = ({ data }: { data: JsonValue }) => {
   )
 
   return (
-    <div>
-      <div className="flex items-center overflow-x-auto p-3">
-        {intersperse(
-          [
-            <Button
-              key={`segment-root`}
-              as="button"
-              variant="light"
-              className="cursor-pointer"
-              onPress={() => setPath([])}
-            >
-              root
-            </Button>,
-            ...path.map((key, index) => (
-              <Button
-                key={`segment-${index}`}
-                as="button"
-                variant="light"
-                className="cursor-pointer"
-                onPress={() => setPath(path.slice(0, index + 1))}
-              >
-                {key}
-              </Button>
-            )),
-          ],
-          (index) => (
-            <ChevronRight
-              key={index}
-              className="flex-none text-xl text-default-500"
-            />
-          ),
-        )}
-      </div>
+    <div className="flex flex-col gap-4">
+      <EditorPath path={path} value={data} onNavigate={setPath} />
 
-      <JsonFieldList
-        value={currentValue}
-        onNavigateField={(subpath) => setPath([...path, ...subpath])}
-      />
+      <Card shadow="sm" className="overflow-hidden">
+        <CardBody className="p-0">
+          <JsonFieldList
+            value={currentValue}
+            onNavigateField={(subpath) => setPath([...path, ...subpath])}
+          />
+        </CardBody>
+      </Card>
     </div>
   )
 }
