@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Tabs, Tab, Button, cn } from "@heroui/react"
-import { Pencil, Plus, X } from "lucide-react"
-import type { DroppedFile, Tab as TabType } from "../types"
+import { ClipboardPaste, Pencil, Plus, X } from "lucide-react"
+import type { TabInit, Tab as TabType } from "../types"
 import {
   addTabsFromFiles,
   removeTab,
@@ -65,7 +65,7 @@ export function TabManager() {
     const results = await Promise.all(
       acceptedFiles.map((f) => readFileAsJson(f).catch(() => null)),
     )
-    const files = results.filter((f): f is DroppedFile => f != null)
+    const files = results.filter((f): f is TabInit => f != null)
     if (files.length) addTabsFromFiles(files)
   }, [])
 
@@ -105,6 +105,28 @@ export function TabManager() {
         >
           <Plus className="size-5" />
           Load File
+        </Button>
+
+        <Button
+          variant="light"
+          aria-label="Load from clipboard"
+          onPress={async () => {
+            const json = await navigator.clipboard.read()
+
+            const files = await Promise.all(
+              json.map(async (item) => {
+                const blob = await item.getType("text/plain")
+                const text = await blob.text()
+
+                return { name: "Clipboard", text }
+              }),
+            )
+
+            addTabsFromFiles(files)
+          }}
+        >
+          <ClipboardPaste className="size-5" />
+          Load from clipboard
         </Button>
       </div>
 

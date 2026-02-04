@@ -22,7 +22,7 @@ export interface Tab {
   path: string[]
 }
 
-export interface DroppedFile {
+export interface TabInit {
   name: string
-  json: string
+  text: string
 }

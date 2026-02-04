@@ -5,6 +5,7 @@ import { CollapseToggle } from "./CollapseToggle"
 import { cn } from "@heroui/react"
 import { JsonFieldIcon } from "./JsonFieldIcon"
 import { datatypeColors, getTypedJsonValue } from "./utils/datatypes"
+import { addTabFromUrl } from "../../stores/tabs"
 
 const INDENT_WIDTH = 16
 
@@ -14,6 +15,16 @@ function getJsonFields(value: JsonValue) {
   }
 
   return Object.entries(value)
+}
+
+const onValuePress = async (value: JsonValue, fieldKey: string | null) => {
+  if (typeof value === "string" && URL.canParse(value)) {
+    await addTabFromUrl(value, fieldKey ?? undefined)
+
+    return
+  }
+
+  await navigator.clipboard.writeText(JSON.stringify(value))
 }
 
 export const JsonFieldList = ({
@@ -98,9 +109,7 @@ export const JsonFieldList = ({
               "cursor-pointer truncate font-mono",
               fields ? "text-default-400 italic" : typeColor,
             )}
-            onClick={() =>
-              navigator.clipboard.writeText(JSON.stringify(typedValue.value))
-            }
+            onClick={() => onValuePress(typedValue.value, fieldKey)}
           >
             {fields
               ? pluralize(fields.length, "item")

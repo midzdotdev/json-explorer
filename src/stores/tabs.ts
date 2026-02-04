@@ -1,5 +1,5 @@
 import { proxy, useSnapshot } from "valtio"
-import type { DroppedFile, JsonValue, Tab } from "../types"
+import type { TabInit, JsonValue, Tab } from "../types"
 
 type TabsState = {
   tabs: Tab[]
@@ -11,12 +11,12 @@ export const tabsState = proxy<TabsState>({
   activeTabId: null,
 })
 
-export const addTabsFromFiles = (files: DroppedFile[]) => {
-  const newTabs = files.map(({ name, json }) =>
+export const addTabsFromFiles = (files: TabInit[]) => {
+  const newTabs = files.map(({ name, text }) =>
     proxy<Tab>({
       id: `tab-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       name,
-      data: JSON.parse(json) as JsonValue,
+      data: JSON.parse(text) as JsonValue,
       path: [],
     }),
   )
@@ -27,6 +27,23 @@ export const addTabsFromFiles = (files: DroppedFile[]) => {
     // Switch to the first new tab (when adding first file or adding more)
     tabsState.activeTabId = newTabs[0].id
   }
+}
+
+export const addTabFromUrl = async (url: string, name?: string) => {
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+
+  const text = await response.text()
+
+  return addTabsFromFiles([
+    {
+      name: name ?? "URL",
+      text,
+    },
+  ])
 }
 
 export const removeTab = (id: string) => {

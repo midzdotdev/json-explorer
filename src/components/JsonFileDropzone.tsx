@@ -2,9 +2,9 @@ import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Card, CardBody, cn } from "@heroui/react"
 import { FileText, Upload } from "lucide-react"
-import type { DroppedFile } from "../types"
+import type { TabInit } from "../types"
 
-export function readFileAsJson(file: File): Promise<DroppedFile> {
+export function readFileAsJson(file: File): Promise<TabInit> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onabort = () => reject(new Error("aborted"))
@@ -14,7 +14,7 @@ export function readFileAsJson(file: File): Promise<DroppedFile> {
         reject(new Error("expected string"))
         return
       }
-      resolve({ name: file.name, json: reader.result })
+      resolve({ name: file.name, text: reader.result })
     }
     reader.readAsText(file)
   })
@@ -23,7 +23,7 @@ export function readFileAsJson(file: File): Promise<DroppedFile> {
 export const JsonFileDropzone = ({
   onFilesLoaded,
 }: {
-  onFilesLoaded: (files: DroppedFile[]) => void
+  onFilesLoaded: (files: TabInit[]) => void
 }) => {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -33,7 +33,7 @@ export const JsonFileDropzone = ({
       const results = await Promise.all(
         acceptedFiles.map((f) => readFileAsJson(f).catch(() => null)),
       )
-      const files = results.filter((f): f is DroppedFile => f != null)
+      const files = results.filter((f): f is TabInit => f != null)
       if (files.length) onFilesLoaded(files)
     },
     [onFilesLoaded],
