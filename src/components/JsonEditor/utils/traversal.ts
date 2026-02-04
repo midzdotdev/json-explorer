@@ -1,6 +1,6 @@
 import type { JsonValue } from "../../../types"
 
-export function getJsonValueByPath(value: JsonValue, path: string[]) {
+export function getJsonValueByPath(value: JsonValue, path: readonly string[]) {
   if (path.length === 0) {
     return value
   }

@@ -13,3 +13,16 @@ export type JsonTypedValue =
   | { type: "array"; value: JsonValue[] }
 
 export type JsonDatatype = JsonTypedValue["type"]
+
+export interface Tab {
+  id: string
+  name: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any
+  path: string[]
+}
+
+export interface DroppedFile {
+  name: string
+  json: string
+}

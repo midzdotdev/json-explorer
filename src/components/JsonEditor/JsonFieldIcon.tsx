@@ -1,20 +1,31 @@
 import { cn } from "tailwind-variants"
-import { getDatatypeColor, getDatatypeIcon } from "./utils/datatypes"
-import { useMemo } from "react"
+import { datatypeColors } from "./utils/datatypes"
 import type { JsonDatatype } from "../../types"
+import { memo } from "react"
+import {
+  CircleSlash2,
+  Type,
+  Hash,
+  Power,
+  Box,
+  List,
+  type LucideIcon,
+} from "lucide-react"
 
-export const JsonFieldIcon = ({
-  type,
-  className,
-}: {
-  type: JsonDatatype
-  className?: string
-}) => {
-  const Icon = useMemo(() => getDatatypeIcon(type), [type])
-  const color = getDatatypeColor(type)
+const datatypeIcons = {
+  null: CircleSlash2,
+  string: Type,
+  number: Hash,
+  boolean: Power,
+  object: Box,
+  array: List,
+} satisfies Record<JsonDatatype, LucideIcon>
 
-  return (
-    // eslint-disable-next-line react-hooks/static-components
-    <Icon className={cn(`size-4 ${color} flex-none`, className)} />
-  )
-}
+export const JsonFieldIcon = memo(
+  ({ type, className }: { type: JsonDatatype; className?: string }) => {
+    const Icon = datatypeIcons[type]
+    const color = datatypeColors[type]
+
+    return <Icon className={cn(`size-4 ${color} flex-none`, className)} />
+  },
+)

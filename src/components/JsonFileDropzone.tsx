@@ -1,33 +1,42 @@
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
-import { Card, CardBody } from "@heroui/react"
+import { Card, CardBody, cn } from "@heroui/react"
 import { FileText, Upload } from "lucide-react"
+import type { DroppedFile } from "../types"
+
+export function readFileAsJson(file: File): Promise<DroppedFile> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onabort = () => reject(new Error("aborted"))
+    reader.onerror = () => reject(new Error("read failed"))
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("expected string"))
+        return
+      }
+      resolve({ name: file.name, json: reader.result })
+    }
+    reader.readAsText(file)
+  })
+}
 
 export const JsonFileDropzone = ({
-  onChange,
+  onFilesLoaded,
 }: {
-  onChange: (json: string) => void
+  onFilesLoaded: (files: DroppedFile[]) => void
 }) => {
   const [isDragging, setIsDragging] = useState(false)
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
+    async (acceptedFiles: File[]) => {
       setIsDragging(false)
-      acceptedFiles.forEach((file) => {
-        const reader = new FileReader()
-
-        reader.onabort = () => console.log("file reading was aborted")
-        reader.onerror = () => console.log("file reading has failed")
-        reader.onload = () => {
-          if (typeof reader.result !== "string") return
-
-          onChange(reader.result)
-        }
-
-        reader.readAsText(file)
-      })
+      const results = await Promise.all(
+        acceptedFiles.map((f) => readFileAsJson(f).catch(() => null)),
+      )
+      const files = results.filter((f): f is DroppedFile => f != null)
+      if (files.length) onFilesLoaded(files)
     },
-    [onChange],
+    [onFilesLoaded],
   )
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -35,6 +44,7 @@ export const JsonFileDropzone = ({
     accept: { "application/json": [".json"] },
     onDragEnter: () => setIsDragging(true),
     onDragLeave: () => setIsDragging(false),
+    multiple: true,
   })
 
   return (
@@ -42,9 +52,10 @@ export const JsonFileDropzone = ({
       <div {...getRootProps()} className="cursor-pointer">
         <input {...getInputProps()} />
         <Card
-          className={`transition-all ${
-            isDragging ? "scale-105 border-primary" : ""
-          }`}
+          className={cn(
+            "transition-all duration-150",
+            isDragging && "scale-105 border-primary",
+          )}
           shadow="lg"
         >
           <CardBody className="flex flex-col items-center justify-center gap-4 p-12">
@@ -63,10 +74,7 @@ export const JsonFileDropzone = ({
             </div>
             <div className="text-center">
               <p className="text-lg font-medium">
-                Drag &apos;n&apos; drop a JSON file here, or click to select
-              </p>
-              <p className="mt-2 text-sm text-default-500">
-                Supports .json files
+                Drop JSON files here, or click to select
               </p>
             </div>
           </CardBody>

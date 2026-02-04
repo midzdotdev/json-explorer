@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { Button } from "@heroui/react"
+import { Button, cn } from "@heroui/react"
 import { intersperse } from "../../utils/intersperse"
 import { ChevronRight } from "lucide-react"
 import { getJsonValueType } from "./utils/datatypes"
@@ -23,10 +23,12 @@ export const EditorPath = ({
   value,
   path,
   onNavigate,
+  className,
 }: {
   value: JsonValue
-  path: string[]
+  path: readonly string[]
   onNavigate: (path: string[]) => void
+  className?: string
 }) => {
   const pathScrollRef = useRef<HTMLDivElement>(null)
 
@@ -53,7 +55,7 @@ export const EditorPath = ({
   }, [path])
 
   return (
-    <div className="overflow-hidden rounded-xl bg-content1">
+    <div className={cn("overflow-hidden rounded-xl bg-content2", className)}>
       <div
         ref={pathScrollRef}
         className="flex flex-row items-center overflow-x-auto p-3"

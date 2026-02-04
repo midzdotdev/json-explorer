@@ -3,8 +3,10 @@ import type { JsonValue } from "../../types"
 import { pluralize } from "../../utils/pluralize"
 import { CollapseToggle } from "./CollapseToggle"
 import { cn } from "@heroui/react"
-import { getDatatypeColor, getTypedJsonValue } from "./utils/datatypes"
 import { JsonFieldIcon } from "./JsonFieldIcon"
+import { datatypeColors, getTypedJsonValue } from "./utils/datatypes"
+
+const INDENT_WIDTH = 16
 
 function getJsonFields(value: JsonValue) {
   if (value === null || typeof value !== "object") {
@@ -25,7 +27,7 @@ export const JsonFieldList = ({
   depth?: number
   fieldKey?: string | null
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const typedValue = getTypedJsonValue(value)
 
@@ -34,7 +36,7 @@ export const JsonFieldList = ({
   const isExpandable =
     typedValue.type === "object" || typedValue.type === "array"
 
-  const typeColor = getDatatypeColor(typedValue.type)
+  const typeColor = datatypeColors[typedValue.type]
 
   const getNestedFields = useCallback((): ReactNode => {
     return (fields ?? []).map(([key, value]) => {
@@ -58,13 +60,21 @@ export const JsonFieldList = ({
 
   return (
     <>
-      <div className="group flex h-10 flex-row items-stretch gap-2 border-b border-divider transition-colors hover:bg-default-50">
+      <div
+        className={cn(
+          "group flex h-10 flex-row items-stretch gap-2 border-b border-divider bg-content1 transition-colors hover:bg-default-50",
+          isExpandable && "sticky",
+        )}
+        style={{
+          top: isExpandable ? (depth - 1) * 40 : undefined,
+        }}
+      >
         <div
           className="flex w-3/5 items-center gap-2"
-          style={{ paddingLeft: `${depth * 16}px` }}
+          style={{ paddingLeft: `${depth * INDENT_WIDTH}px` }}
         >
           {!isExpandable ? (
-            <div className="size-4" />
+            <div className="size-4 flex-none" />
           ) : (
             <CollapseToggle isOpen={isExpanded} setIsOpen={setIsExpanded} />
           )}
@@ -73,7 +83,7 @@ export const JsonFieldList = ({
 
           <KeyTag
             className={cn(
-              "font-mono transition-colors",
+              "truncate font-mono transition-colors",
               isExpandable && "cursor-pointer hover:underline",
             )}
             onClick={isExpandable ? () => onNavigateField([]) : undefined}
@@ -85,9 +95,12 @@ export const JsonFieldList = ({
         <div className="flex w-2/5 items-center gap-2">
           <span
             className={cn(
-              "font-mono",
+              "cursor-pointer truncate font-mono",
               fields ? "text-default-400 italic" : typeColor,
             )}
+            onClick={() =>
+              navigator.clipboard.writeText(JSON.stringify(typedValue.value))
+            }
           >
             {fields
               ? pluralize(fields.length, "item")

@@ -17,7 +17,7 @@ export const CollapseToggle = ({
       onClick={() => setIsOpen?.(!isOpen)}
       disabled={disabled}
       className={cn(
-        "cursor-pointer",
+        "flex-none cursor-pointer",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}

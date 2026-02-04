@@ -1,4 +1,3 @@
-import { CircleSlash2, Type, Hash, Power, Box, List } from "lucide-react"
 import type { JsonValue, JsonDatatype, JsonTypedValue } from "../../../types"
 
 export const getJsonValueType = (value: JsonValue) => {
@@ -28,22 +27,11 @@ export function getTypedJsonValue(value: JsonValue): JsonTypedValue {
   }
 }
 
-export const getDatatypeColor = (type: JsonDatatype) =>
-  ({
-    null: "text-null-foreground",
-    string: "text-string-foreground",
-    number: "text-number-foreground",
-    boolean: "text-boolean-foreground",
-    object: "text-object-foreground",
-    array: "text-array-foreground",
-  })[type]
-
-export const getDatatypeIcon = (type: JsonDatatype) =>
-  ({
-    null: CircleSlash2,
-    string: Type,
-    number: Hash,
-    boolean: Power,
-    object: Box,
-    array: List,
-  })[type]
+export const datatypeColors = {
+  null: "text-null-foreground",
+  string: "text-string-foreground",
+  number: "text-number-foreground",
+  boolean: "text-boolean-foreground",
+  object: "text-object-foreground",
+  array: "text-array-foreground",
+} satisfies Record<JsonDatatype, `text-${JsonDatatype}-foreground`>
