@@ -46,6 +46,45 @@ export const addTabFromUrl = async (url: string, name?: string) => {
   ])
 }
 
+export const addTabsFromClipboard = async () => {
+  const items = await navigator.clipboard.read()
+
+  const files = await Promise.all(
+    items.map(async (item) => {
+      const blob = await item.getType("text/plain")
+      const text = await blob.text()
+
+      return { name: "Clipboard", text }
+    }),
+  )
+
+  addTabsFromFiles(files)
+}
+
+export const addTabsFromClipboardEvent = async (e: ClipboardEvent) => {
+  const items = e.clipboardData?.items
+
+  if (!items) return
+
+  const files = (
+    await Promise.all(
+      Array.from(items).map(async (item) => {
+        if (item.type !== "text/plain") return null
+
+        const text = await new Promise((resolve) => item.getAsString(resolve))
+
+        if (!text) return null
+
+        const name = "Clipboard"
+
+        return { name, text }
+      }),
+    )
+  ).filter((x): x is TabInit => x !== null)
+
+  addTabsFromFiles(files)
+}
+
 export const removeTab = (id: string) => {
   const idx = tabsState.tabs.findIndex((t) => t.id === id)
   if (idx === -1) return

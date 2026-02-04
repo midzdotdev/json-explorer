@@ -4,6 +4,7 @@ import { Tabs, Tab, Button, cn } from "@heroui/react"
 import { ClipboardPaste, Pencil, Plus, X } from "lucide-react"
 import type { TabInit, Tab as TabType } from "../types"
 import {
+  addTabsFromClipboard,
   addTabsFromFiles,
   removeTab,
   setActiveTab,
@@ -110,20 +111,7 @@ export function TabManager() {
         <Button
           variant="light"
           aria-label="Load from clipboard"
-          onPress={async () => {
-            const json = await navigator.clipboard.read()
-
-            const files = await Promise.all(
-              json.map(async (item) => {
-                const blob = await item.getType("text/plain")
-                const text = await blob.text()
-
-                return { name: "Clipboard", text }
-              }),
-            )
-
-            addTabsFromFiles(files)
-          }}
+          onPress={addTabsFromClipboard}
         >
           <ClipboardPaste className="size-5" />
           Load from clipboard
