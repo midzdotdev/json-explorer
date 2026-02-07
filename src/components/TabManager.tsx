@@ -1,16 +1,22 @@
-import { useCallback, useState } from "react"
+import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Tabs, Tab, Button, cn } from "@heroui/react"
-import { ClipboardPaste, Pencil, Plus, X } from "lucide-react"
-import type { TabInit, Tab as TabType } from "../types"
+import {
+  ClipboardPaste,
+  Download,
+  FileText,
+  Pencil,
+  Plus,
+  X,
+} from "lucide-react"
 import {
   addTabsFromClipboard,
   addTabsFromFiles,
   removeTab,
   setActiveTab,
   tabsState,
-} from "../stores/tabs"
-import { JsonFileDropzone, readFileAsJson } from "./JsonFileDropzone"
+  type Tab as TabType,
+} from "../lib/tabs"
 import { TabContent } from "./TabContent"
 import { RenameTabModal } from "./RenameTabModal"
 import { useSnapshot, type Snapshot } from "valtio"
@@ -62,22 +68,14 @@ export function TabManager() {
   const { tabs, activeTabId } = useSnapshot(tabsState)
   const [renameTabId, setRenameTabId] = useState<string | null>(null)
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const results = await Promise.all(
-      acceptedFiles.map((f) => readFileAsJson(f).catch(() => null)),
-    )
-    const files = results.filter((f): f is TabInit => f != null)
-    if (files.length) addTabsFromFiles(files)
-  }, [])
-
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   const { getRootProps, getInputProps, open } = useDropzone({
-    onDrop,
+    onDrop: addTabsFromFiles,
     accept: { "application/json": [".json"] },
     multiple: true,
-    noClick: true,
     noKeyboard: true,
+    noClick: tabs.length > 0,
     onDragEnter: () => setIsDraggingOver(true),
     onDragLeave: () => setIsDraggingOver(false),
     onDropAccepted: () => setIsDraggingOver(false),
@@ -85,7 +83,44 @@ export function TabManager() {
   })
 
   if (tabs.length === 0) {
-    return <JsonFileDropzone onFilesLoaded={addTabsFromFiles} />
+    return (
+      <div
+        {...getRootProps()}
+        className={cn(
+          "relative flex h-screen flex-col bg-content1",
+          isDraggingOver && "border-b transition-colors",
+        )}
+      >
+        <input {...getInputProps()} className="hidden" />
+
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-all",
+            isDraggingOver && "pointer-events-none scale-110 opacity-100",
+          )}
+          aria-hidden
+        >
+          <div className="rounded-full bg-primary-100 p-[2svh] text-primary">
+            <Download className="size-[13svh]" strokeWidth={2} />
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "flex flex-1 flex-col items-center justify-center gap-4",
+          )}
+        >
+          <div className="rounded-full bg-default-100 p-4 text-default-500">
+            <FileText className="h-10 w-10" strokeWidth={2} />
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-1 text-center">
+            <p className="text-3xl font-medium">Drop JSON files here</p>
+            <p className="text-default-500">or press to open the file picker</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -97,7 +132,6 @@ export function TabManager() {
       )}
     >
       <input {...getInputProps()} className="hidden" />
-
       <div className="flex flex-none items-center gap-2 p-2">
         <Button
           variant="light"
@@ -105,7 +139,7 @@ export function TabManager() {
           onPress={open}
         >
           <Plus className="size-5" />
-          Load File
+          Load file
         </Button>
 
         <Button

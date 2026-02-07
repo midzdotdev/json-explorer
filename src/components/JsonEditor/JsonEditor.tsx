@@ -1,7 +1,6 @@
-import { useMemo } from "react"
-import type { JsonValue } from "../../types"
-import { getJsonValueByPath } from "./utils/traversal"
-import { setTabPath, useTab } from "../../stores/tabs"
+import { useCallback, useMemo } from "react"
+import { getJsonValueByPath, type JsonValue } from "../../lib/json"
+import { addTabFromLink, setTabPath, useTab } from "../../lib/tabs"
 import { JsonFieldList } from "./JsonFieldList"
 import { EditorPath } from "./EditorPath"
 
@@ -23,6 +22,30 @@ export const JsonEditor = ({
     [data, tab.path],
   )
 
+  const onValuePress = useCallback(
+    async (path: string[]) => {
+      const value = getJsonValueByPath(data, [...tab.path, ...path])
+
+      let hasLoadedLink = false
+
+      if (typeof value === "string" && URL.canParse(value)) {
+        const response = await fetch(value)
+
+        if (
+          response.headers.get("content-type")?.includes("application/json")
+        ) {
+          await addTabFromLink(tabId, path, response)
+          hasLoadedLink = true
+        }
+      }
+
+      if (!hasLoadedLink) {
+        await navigator.clipboard.writeText(JSON.stringify(value))
+      }
+    },
+    [data, tabId, tab.path],
+  )
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <EditorPath
@@ -36,6 +59,7 @@ export const JsonEditor = ({
         <JsonFieldList
           value={currentValue}
           onNavigateField={(subpath) => setPath([...tab.path, ...subpath])}
+          onValuePress={onValuePress}
         />
       </div>
     </div>

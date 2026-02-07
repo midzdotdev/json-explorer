@@ -1,11 +1,10 @@
 import { useCallback, useState, type ReactNode } from "react"
-import type { JsonValue } from "../../types"
 import { pluralize } from "../../utils/pluralize"
 import { CollapseToggle } from "./CollapseToggle"
 import { cn } from "@heroui/react"
 import { JsonFieldIcon } from "./JsonFieldIcon"
 import { datatypeColors, getTypedJsonValue } from "./utils/datatypes"
-import { addTabFromUrl } from "../../stores/tabs"
+import type { JsonValue } from "../../lib/json"
 
 const INDENT_WIDTH = 16
 
@@ -17,32 +16,26 @@ function getJsonFields(value: JsonValue) {
   return Object.entries(value)
 }
 
-const onValuePress = async (value: JsonValue, fieldKey: string | null) => {
-  if (typeof value === "string" && URL.canParse(value)) {
-    await addTabFromUrl(value, fieldKey ?? undefined)
-
-    return
-  }
-
-  await navigator.clipboard.writeText(JSON.stringify(value))
-}
-
 export const JsonFieldList = ({
   value,
   depth = 0,
   fieldKey = null,
   onNavigateField,
+  onValuePress,
 }: {
   value: JsonValue
   onNavigateField: (path: string[]) => void
+  onValuePress: (path: string[]) => void
   depth?: number
   fieldKey?: string | null
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const fields = getJsonFields(value)
+
+  const [isExpanded, setIsExpanded] = useState(
+    fields !== null && fields.length === 1,
+  )
 
   const typedValue = getTypedJsonValue(value)
-
-  const fields = getJsonFields(value)
 
   const isExpandable =
     typedValue.type === "object" || typedValue.type === "array"
@@ -58,10 +51,11 @@ export const JsonFieldList = ({
           depth={depth + 1}
           fieldKey={key}
           onNavigateField={(path) => onNavigateField([key, ...path])}
+          onValuePress={(path) => onValuePress([key, ...path])}
         />
       )
     })
-  }, [fields, onNavigateField, depth])
+  }, [fields, onNavigateField, onValuePress, depth])
 
   const KeyTag = isExpandable ? "button" : "span"
 
@@ -109,7 +103,7 @@ export const JsonFieldList = ({
               "cursor-pointer truncate font-mono",
               fields ? "text-default-400 italic" : typeColor,
             )}
-            onClick={() => onValuePress(typedValue.value, fieldKey)}
+            onClick={() => onValuePress([])}
           >
             {fields
               ? pluralize(fields.length, "item")

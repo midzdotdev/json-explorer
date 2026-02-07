@@ -1,4 +1,12 @@
-import type { JsonValue } from "../../../types"
+export type JsonPrimitive = string | number | boolean | null
+
+export type JsonIterable = JsonValue[] | { [key: string]: JsonValue }
+
+export type JsonValue = JsonPrimitive | JsonIterable
+
+export const parseJson = (text: string): JsonValue => {
+  return JSON.parse(text)
+}
 
 export function getJsonValueByPath(value: JsonValue, path: readonly string[]) {
   if (path.length === 0) {

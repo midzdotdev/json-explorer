@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { TabManager } from "./components/TabManager"
-import { addTabsFromClipboardEvent } from "./stores/tabs"
+import { addTabsFromClipboardEvent } from "./lib/tabs"
 
 const handlePaste = (e: ClipboardEvent) => {
   const target = e.target as HTMLElement

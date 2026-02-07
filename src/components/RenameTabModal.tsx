@@ -8,7 +8,7 @@ import {
   Button,
   Input,
 } from "@heroui/react"
-import { updateTabName, useTab } from "../stores/tabs"
+import { updateTabName, useTab } from "../lib/tabs"
 
 export function RenameTabModal({
   tabId,

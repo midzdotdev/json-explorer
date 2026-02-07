@@ -1,6 +1,6 @@
 import type { Snapshot } from "valtio"
-import type { Tab } from "../types"
 import { JsonEditor } from "./JsonEditor/JsonEditor"
+import type { Tab } from "../lib/tabs"
 
 export function TabContent({ tab }: { tab: Snapshot<Tab> }) {
   return (

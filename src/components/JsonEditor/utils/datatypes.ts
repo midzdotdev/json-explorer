@@ -1,4 +1,5 @@
-import type { JsonValue, JsonDatatype, JsonTypedValue } from "../../../types"
+import type { JsonValue } from "../../../lib/json"
+import type { JsonDatatype, JsonTypedValue } from "../../../types"
 
 export const getJsonValueType = (value: JsonValue) => {
   switch (true) {

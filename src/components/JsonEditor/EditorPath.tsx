@@ -3,8 +3,8 @@ import { Button, cn } from "@heroui/react"
 import { intersperse } from "../../utils/intersperse"
 import { ChevronRight } from "lucide-react"
 import { getJsonValueType } from "./utils/datatypes"
-import { getJsonValueByPath } from "./utils/traversal"
-import type { JsonValue, JsonDatatype } from "../../types"
+import { getJsonValueByPath, type JsonValue } from "../../lib/json"
+import type { JsonDatatype } from "../../types"
 import { JsonFieldIcon } from "./JsonFieldIcon"
 
 interface PathSegment {

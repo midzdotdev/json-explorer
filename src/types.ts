@@ -1,8 +1,4 @@
-export type JsonPrimitive = string | number | boolean | null
-
-export type JsonIterable = JsonValue[] | { [key: string]: JsonValue }
-
-export type JsonValue = JsonPrimitive | JsonIterable
+import type { JsonValue } from "./lib/json"
 
 export type JsonTypedValue =
   | { type: "null"; value: null }
@@ -13,16 +9,3 @@ export type JsonTypedValue =
   | { type: "array"; value: JsonValue[] }
 
 export type JsonDatatype = JsonTypedValue["type"]
-
-export interface Tab {
-  id: string
-  name: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any
-  path: string[]
-}
-
-export interface TabInit {
-  name: string
-  text: string
-}
